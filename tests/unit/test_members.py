@@ -1,4 +1,5 @@
 from unittest import TestCase
+from unittest.mock import patch, Mock
 from family_tree.member import Member, Gender
 
 
@@ -111,3 +112,11 @@ class TestMember(TestCase):
 
         member.spouse.mother = spouse_mother
         self.assertEqual(member.get_spouse_mother(), spouse_mother)
+
+    @patch("family_tree.member.Member.get_paternal_grandmother", return_value=None)
+    def test_get_paternal_aunt(self, mock_get_paternal_grandmother):
+        # check get_paternal_grandmother has been replaced by a mock
+        self.assertEqual(isinstance(self.member.get_paternal_grandmother, Mock), True)
+
+        # check for None values
+        self.assertEqual(self.member.get_paternal_aunt(), "NONE")

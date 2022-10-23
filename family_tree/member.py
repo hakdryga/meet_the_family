@@ -68,3 +68,8 @@ class Member:
         if not self.spouse.mother:
             return None
         return self.spouse.mother
+
+    def get_paternal_aunt(self):
+        grandmother = self.get_paternal_grandmother()
+        if not grandmother:
+            return "NONE"
