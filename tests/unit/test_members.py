@@ -25,8 +25,8 @@ class TestMember(TestCase):
         self.assertRaises(ValueError, Member, 2, "Petra", "WrongValue")
 
     def test_set_mother(self):
-        mother_a = "mother_a"                       # ValueError --> no Member object
-        mother_b = Member(2, "MotherA", "Male")     # ValueError --> male
+        mother_a = "mother_a"  # ValueError --> no Member object
+        mother_b = Member(2, "MotherA", "Male")  # ValueError --> male
         mother_c = Member(3, "MotherB", "Female")
         # failure cases
         self.assertRaises(ValueError, self.member.set_mother, mother_a)
@@ -38,9 +38,9 @@ class TestMember(TestCase):
         self.assertEqual(self.member.mother.gender, Gender.female)
 
     def test_set_father(self):
-        father_a = "father_a"                       # ValueError --> no Member object
-        father_b = Member(2, "FatherA", "Male")     # success
-        father_c = Member(3, "FatherB", "Female")   # ValueError --> female
+        father_a = "father_a"  # ValueError --> no Member object
+        father_b = Member(2, "FatherA", "Male")  # success
+        father_c = Member(3, "FatherB", "Female")  # ValueError --> female
         # failure cases
         self.assertRaises(ValueError, self.member.set_father, father_a)
         self.assertRaises(ValueError, self.member.set_father, father_c)
@@ -74,3 +74,40 @@ class TestMember(TestCase):
         self.assertEqual(self.member.children[0].name, "Daughter")
         self.assertEqual(self.member.children[0].gender, Gender.female)
 
+    def test_get_paternal_grandmother(self):
+        member = Member(9, "NewMember", "Male")
+        father = Member(10, "NewMember_father", "Male")
+        grand_mother = Member(11, "NewMember_grandMother", "Female")
+
+        # failure cases
+        self.assertEqual(member.get_paternal_grandmother(), None)
+        member.father = father
+        self.assertEqual(member.get_paternal_grandmother(), None)
+        member.father.mother = grand_mother
+        self.assertEqual(member.get_paternal_grandmother(), grand_mother)
+
+    def test_get_maternal_grandmother(self):
+        member = Member(9, "NewMember", "Male")
+        mother = Member(10, "NewMember_mother", "Female")
+        grand_mother = Member(11, "NewMember_grandMother", "Female")
+
+        # failure cases
+        self.assertEqual(member.get_maternal_grandmother(), None)
+        member.mother = mother
+        self.assertEqual(member.get_maternal_grandmother(), None)
+        member.mother.mother = grand_mother
+        self.assertEqual(member.get_maternal_grandmother(), grand_mother)
+
+    def test_get_spouse_mother(self):
+        member = Member(9, "NewMember", "Male")
+        spouse = Member(10, "NewMember_spouse", "Female")
+        spouse_mother = Member(11, "NewMember_spouse_mother", "Female")
+
+        # failure cases
+        self.assertEqual(member.get_spouse_mother(), None)
+
+        member.spouse = spouse
+        self.assertEqual(member.get_spouse_mother(), None)
+
+        member.spouse.mother = spouse_mother
+        self.assertEqual(member.get_spouse_mother(), spouse_mother)
