@@ -34,10 +34,11 @@ class Member:
 
         self.father = father
 
+
     def set_spouse(self, spouse):
         if not isinstance(spouse, Member):
             raise ValueError("Invalid value for spouse")
-        import pdb; pdb.set_trace()
+        # import pdb; pdb.set_trace()
         if self.gender == spouse.gender:
             raise ValueError("Invalid gender for spouse")
 
