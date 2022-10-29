@@ -184,3 +184,153 @@ class TestMember(TestCase):
         self.assertEqual(paternal_uncle[0].name, "Uncle")  # fifth param from side_effect
         self.assertEqual(paternal_uncle[0].gender, Gender.male)
         self.assertEqual(len(paternal_uncle), 1)
+
+    @patch("family_tree.member.Member.get_maternal_grandmother", side_effect=[
+        None,
+        create_fake_member(),
+        create_fake_member(children=[Member(3, "Mom", "Female")]),
+        create_fake_member(children=[
+            Member(3, "Mom", "Female"),
+            Member(4, "Uncle", "Male")
+        ]),
+        create_fake_member(children=[
+            Member(3, "Mom", "Female"),
+            Member(4, "Uncle", "Male"),
+            Member(5, "Aunt", "Female")
+        ])
+
+    ])
+    def test_get_maternal_aunt(self, mock_get_maternal_grandmother):
+        self.member.mother = Member(3, "Mom", "Female")
+        self.assertEqual(isinstance(self.member.get_maternal_grandmother, Mock), True)
+
+        self.assertEqual(self.member.get_maternal_aunt(), [])  # first param from side_effect
+        self.assertEqual(self.member.get_maternal_aunt(), [])  # second param from side_effect
+        self.assertEqual(self.member.get_maternal_aunt(), [])  # third param from side_effect
+        self.assertEqual(self.member.get_maternal_aunt(), [])  # fourth param from side_effect
+
+        maternal_aunts = self.member.get_maternal_aunt()
+        self.assertEqual(maternal_aunts[0].name, "Aunt")  # fifth param from side_effect
+        self.assertEqual(maternal_aunts[0].gender, Gender.female)
+        self.assertEqual(len(maternal_aunts), 1)
+
+    @patch("family_tree.member.Member.get_maternal_grandmother", side_effect=[
+        None,
+        create_fake_member(),
+        create_fake_member(children=[Member(3, "Mom", "Female")]),
+        create_fake_member(children=[
+            Member(3, "Aunt", "Female"),
+            Member(4, "Mom", "Female")
+        ]),
+        create_fake_member(children=[
+            Member(3, "Mom", "Female"),
+            Member(4, "Uncle", "Male"),
+            Member(5, "Aunt", "Female")
+        ])
+
+    ])
+    def test_get_maternal_uncle(self, mock_get_maternal_grandmother):
+        self.assertEqual(self.member.get_maternal_uncle(), [])  # first param from side_effect
+        self.assertEqual(self.member.get_maternal_uncle(), [])  # second param from side_effect
+        self.assertEqual(self.member.get_maternal_uncle(), [])  # third param from side_effect
+        self.assertEqual(self.member.get_maternal_uncle(), [])  # fourth param from side_effect
+
+        maternal_uncle = self.member.get_maternal_uncle()
+        self.assertEqual(maternal_uncle[0].name, "Uncle")  # fifth param from side_effect
+        self.assertEqual(maternal_uncle[0].gender, Gender.male)
+        self.assertEqual(len(maternal_uncle), 1)
+
+    @patch("family_tree.member.Member.get_spouse_mother", side_effect=[
+        None,
+        create_fake_member(),
+        create_fake_member(children=[Member(3, "Spouse", "Female")]),
+        create_fake_member(children=[
+            Member(3, "Spouse", "Female"),
+            Member(4, "Daughter", "Female")
+        ]),
+        create_fake_member(children=[
+            Member(3, "Spouse", "Female"),
+            Member(4, "Son", "Male"),
+            Member(5, "Daughter", "Female")
+        ])
+
+    ])
+    def test_get_brother_in_law(self, mock_get_spouse_mother):
+        self.member.spouse = Member(3, "Spouse", "Female")
+        self.assertEqual(self.member.get_brother_in_law(), [])
+        self.assertEqual(self.member.get_brother_in_law(), [])
+        self.assertEqual(self.member.get_brother_in_law(), [])
+        self.assertEqual(self.member.get_brother_in_law(), [])
+
+        spouse_brothers = self.member.get_brother_in_law()
+        self.assertEqual(spouse_brothers[0].name, "Son")
+        self.assertEqual(spouse_brothers[0].gender, Gender.male)
+        self.assertEqual(len(spouse_brothers), 1)
+
+    @patch("family_tree.member.Member.get_spouse_mother", side_effect=[
+        None,
+        create_fake_member(),
+        create_fake_member(children=[Member(3, "Spouse", "Female")]),
+        create_fake_member(children=[
+            Member(3, "Spouse", "Female"),
+            Member(4, "Son", "Male")
+        ]),
+        create_fake_member(children=[
+            Member(3, "Spouse", "Female"),
+            Member(4, "Son", "Male"),
+            Member(5, "Daughter", "Female")
+        ])
+
+    ])
+    def test_get_sister_in_law(self, mock_get_spouse_mother):
+        self.member.spouse = Member(3, "Spouse", "Female")
+        self.assertEqual(self.member.get_sister_in_law(), [])
+        self.assertEqual(self.member.get_sister_in_law(), [])
+        self.assertEqual(self.member.get_sister_in_law(), [])
+        self.assertEqual(self.member.get_sister_in_law(), [])
+
+        spouse_sisters = self.member.get_sister_in_law()
+        self.assertEqual(spouse_sisters[0].name, "Daughter")
+        self.assertEqual(spouse_sisters[0].gender, Gender.female)
+        self.assertEqual(len(spouse_sisters), 1)
+
+    def test_get_son(self):
+        member = Member(5, "Dummy", "Male")
+        son = Member(6, "Son", "Male")
+        daughter = Member(7, "Daughter", "Female")
+
+        self.assertEqual(member.get_son(), [])
+        member.children.append(daughter)
+        self.assertEqual(member.get_son(), [])
+        member.children.append(son)
+        sons = member.get_son()
+        self.assertEqual(len(sons), 1)
+        self.assertEqual(sons[0].name, "Son")
+        self.assertEqual(sons[0].gender, Gender.male)
+
+    def test_get_daughter(self):
+        member = Member(5, "Dummy", "Male")
+        son = Member(6, "Son", "Male")
+        daughter = Member(7, "Daughter", "Female")
+
+        self.assertEqual(member.get_daughter(), [])
+        member.children.append(son)
+        self.assertEqual(member.get_daughter(), [])
+        member.children.append(daughter)
+        daughters = member.get_daughter()
+        self.assertEqual(len(daughters), 1)
+        self.assertEqual(daughters[0].name, "Daughter")
+        self.assertEqual(daughters[0].gender, Gender.female)
+
+    def test_get_siblings(self):
+        member = Member(5, "Dummy", "Male")
+        mother = Member(8, "Mom", "Female")
+        son = Member(6, "Son", "Male")
+        daughter = Member(7, "Daughter", "Female")
+
+        self.assertEqual(member.get_siblings(), [])
+        member.mother = mother
+        self.assertEqual(member.get_siblings(), [])
+        mother.children.extend([member, son, daughter])
+        siblings = member.get_siblings()
+        self.assertEqual(len(siblings), 2)
