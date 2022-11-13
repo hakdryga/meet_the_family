@@ -28,7 +28,6 @@ class Member:
     def set_father(self, father):
         if not isinstance(father, Member):
             raise ValueError("Invalid value for father")
-        # import pdb; pdb.set_trace()
         if father.gender != Gender.male:
             raise ValueError("father should be a male!")
 
@@ -137,3 +136,22 @@ class Member:
         if not self.mother.children:
             return []
         return list(filter(lambda x: x.name != self.name, self.mother.children))
+
+    def get_relationship(self, relationship_type):
+        relationship_method_switch = {
+            "paternal_aunt": self.get_paternal_aunt,
+            "paternal_uncle": self.get_paternal_uncle,
+            "maternal_aunt": self.get_maternal_aunt,
+            "maternal_uncle": self.get_maternal_uncle,
+            "brother_in_law": self.get_brother_in_law,
+            "sister_in_law": self.get_sister_in_law,
+            "son": self.get_son,
+            "daughter": self.get_daughter,
+            "siblings": self.get_siblings,
+        }
+
+        relationship_method = relationship_method_switch.get(relationship_type, None)
+        if relationship_method:
+            return relationship_method()
+        else:
+            return []
